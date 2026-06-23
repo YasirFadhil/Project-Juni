@@ -1,0 +1,2228 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PROSES JUAL BELI - Bahan Ajar Interaktif Pemasaran</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --amber: #f59e0b;
+        --amber-dark: #d97706;
+        --orange: #ea580c;
+        --dark: #0c0a09;
+        --panel: #1c1917;
+        --card: #292524;
+        --border: #44403c;
+        --text: #fafaf9;
+        --muted: #a8a29e;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--dark);
+        color: var(--text);
+        overflow-x: hidden;
+      }
+      .font-display {
+        font-family: "Syne", sans-serif;
+      }
+      .font-mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      /* Page transitions */
+      .page-section {
+        display: none;
+        animation: fadeUp 0.4s ease forwards;
+      }
+      .page-section.active {
+        display: block;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Ticker tape bg */
+      .ticker-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      .ticker-line {
+        position: absolute;
+        white-space: nowrap;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(245, 158, 11, 0.04);
+        animation: scrollLeft linear infinite;
+      }
+      @keyframes scrollLeft {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* Cards */
+      .card-market {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        transition:
+          border-color 0.2s,
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .card-market:hover {
+        border-color: var(--amber);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px -8px rgba(245, 158, 11, 0.2);
+      }
+      .badge-tag {
+        background: rgba(245, 158, 11, 0.12);
+        color: var(--amber);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* Stepper */
+      .step-dot {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 13px;
+        border: 2px solid var(--border);
+        color: var(--muted);
+        transition: all 0.3s;
+        flex-shrink: 0;
+      }
+      .step-dot.active {
+        background: var(--amber);
+        color: var(--dark);
+        border-color: var(--amber);
+        box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+      }
+      .step-dot.done {
+        background: var(--card);
+        color: var(--amber);
+        border-color: var(--amber);
+      }
+      .step-line {
+        flex: 1;
+        height: 2px;
+        background: var(--border);
+        margin: 0 4px;
+        transition: background 0.3s;
+      }
+      .step-line.done {
+        background: var(--amber);
+      }
+
+      /* Flowchart nodes */
+      .flow-node {
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: var(--card);
+        min-width: 130px;
+      }
+      .flow-node:hover,
+      .flow-node.active {
+        border-color: var(--amber);
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--amber);
+      }
+      .flow-arrow {
+        text-align: center;
+        color: var(--amber);
+        font-size: 18px;
+        margin: 4px 0;
+      }
+
+      /* Drag & Drop */
+      .drag-item {
+        background: var(--card);
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: grab;
+        transition: all 0.2s;
+        user-select: none;
+      }
+      .drag-item:hover {
+        border-color: var(--amber);
+        color: var(--amber);
+      }
+      .drag-item.dragging {
+        opacity: 0.4;
+      }
+      .drop-zone {
+        min-height: 80px;
+        border: 2px dashed var(--border);
+        border-radius: 10px;
+        padding: 10px;
+        transition: all 0.2s;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: flex-start;
+      }
+      .drop-zone.dragover {
+        border-color: var(--amber);
+        background: rgba(245, 158, 11, 0.05);
+      }
+      .placed-item {
+        background: rgba(245, 158, 11, 0.15);
+        border: 1px solid rgba(245, 158, 11, 0.4);
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--amber);
+      }
+      .wrong-item {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #f87171;
+      }
+
+      /* Quiz */
+      .quiz-option {
+        background: var(--card);
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+      }
+      .quiz-option:hover {
+        border-color: var(--amber);
+      }
+      .quiz-option.correct {
+        border-color: #22c55e;
+        background: rgba(34, 197, 94, 0.12);
+        color: #86efac;
+      }
+      .quiz-option.wrong {
+        border-color: #ef4444;
+        background: rgba(239, 68, 68, 0.12);
+        color: #fca5a5;
+      }
+      .quiz-option.selected {
+        border-color: var(--amber);
+        background: rgba(245, 158, 11, 0.1);
+      }
+
+      /* Progress bar */
+      .progress-bar {
+        height: 6px;
+        border-radius: 3px;
+        background: var(--border);
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 3px;
+        background: linear-gradient(90deg, var(--amber), var(--orange));
+        transition: width 0.4s ease;
+      }
+
+      /* Toast */
+      #toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .toast {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 16px;
+        min-width: 260px;
+        max-width: 320px;
+        font-size: 13px;
+        animation: toastIn 0.3s ease;
+      }
+      .toast.success {
+        border-color: #22c55e;
+      }
+      .toast.error {
+        border-color: #ef4444;
+      }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      /* Btn styles */
+      .btn-primary {
+        background: var(--amber);
+        color: var(--dark);
+        font-weight: 800;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 24px;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.1s;
+        font-family: "Syne", sans-serif;
+        font-size: 14px;
+      }
+      .btn-primary:hover {
+        background: var(--amber-dark);
+        transform: scale(1.02);
+      }
+      .btn-secondary {
+        background: transparent;
+        color: var(--muted);
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 9px 22px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+      }
+      .btn-secondary:hover {
+        border-color: var(--amber);
+        color: var(--amber);
+      }
+
+      /* Header */
+      #app-header {
+        background: rgba(12, 10, 9, 0.9);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      /* Accordion */
+      .accordion-body {
+        display: none;
+      }
+      .accordion-body.open {
+        display: block;
+      }
+
+      /* Score badge */
+      .score-badge {
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        border-radius: 8px;
+        padding: 4px 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        color: var(--amber);
+        font-weight: 700;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--dark);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+
+      /* Mobile responsive */
+      @media (max-width: 640px) {
+        .flow-node {
+          min-width: 90px;
+          font-size: 11px;
+          padding: 8px 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Ambient ticker background -->
+    <div class="ticker-bg" id="ticker-bg"></div>
+
+    <!-- Toast container -->
+    <div id="toast-container"></div>
+
+    <!-- ===== HEADER ===== -->
+    <header id="app-header" class="hidden sticky top-0 z-50 px-4 py-3">
+      <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-9 h-9 rounded-lg bg-amber-500 flex items-center justify-center text-stone-900 font-black text-sm font-mono"
+          >
+            PM
+          </div>
+          <div>
+            <div
+              class="font-display text-sm font-black text-white leading-none"
+            >
+              PEMASARAN
+            </div>
+            <div class="text-xs text-stone-400">
+              Halo,
+              <span id="header-name" class="text-amber-400 font-semibold"
+                >Pebisnis</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-1 flex-wrap justify-center">
+          <button
+            onclick="goTo('menu-utama')"
+            class="btn-secondary text-xs px-3 py-1.5"
+          >
+            🏠 Menu
+          </button>
+          <button
+            onclick="goTo('pendahuluan')"
+            class="btn-secondary text-xs px-3 py-1.5"
+          >
+            📘 Materi
+          </button>
+          <button
+            onclick="goTo('simulasi')"
+            class="btn-secondary text-xs px-3 py-1.5"
+          >
+            🎮 Simulasi
+          </button>
+          <button
+            onclick="goTo('evaluasi')"
+            class="btn-secondary text-xs px-3 py-1.5"
+          >
+            🎯 Evaluasi
+          </button>
+        </div>
+        <div class="score-badge">⭐ <span id="header-score">0</span> poin</div>
+      </div>
+    </header>
+
+    <main class="relative z-10 max-w-6xl mx-auto px-4 py-6 min-h-screen">
+      <!-- ===== PAGE: INTRO ===== -->
+      <section id="page-intro" class="page-section active max-w-2xl mx-auto">
+        <div class="mt-12 mb-8 text-center">
+          <div class="inline-block badge-tag mb-4">
+            Jurusan Bisnis &amp; Pemasaran · SMK
+          </div>
+          <h1
+            class="font-display text-5xl md:text-6xl font-black leading-none mb-4"
+          >
+            PROSES<br />
+            <span style="color: var(--amber)">JUAL BELI</span>
+          </h1>
+          <p class="text-stone-400 text-sm leading-relaxed max-w-md mx-auto">
+            Pelajari alur transaksi pasar — dari kebutuhan konsumen, negosiasi,
+            hingga serah terima barang. Media pembelajaran interaktif untuk
+            calon pemasar profesional.
+          </p>
+        </div>
+
+        <div class="card-market p-6 max-w-md mx-auto">
+          <h2 class="font-display font-black text-lg mb-4">Siapa kamu?</h2>
+          <div class="space-y-3 mb-4">
+            <div>
+              <label class="text-xs text-stone-400 font-semibold block mb-1"
+                >NAMA LENGKAP</label
+              >
+              <input
+                id="input-name"
+                type="text"
+                placeholder="Masukkan nama kamu..."
+                class="w-full bg-stone-900 border border-stone-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors"
+              />
+            </div>
+            <div>
+              <label class="text-xs text-stone-400 font-semibold block mb-1"
+                >KELAS</label
+              >
+              <select
+                id="input-kelas"
+                class="w-full bg-stone-900 border border-stone-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors"
+              >
+                <option value="">-- Pilih kelas --</option>
+                <option>X Pemasaran 1</option>
+                <option>X Pemasaran 2</option>
+                <option>XI Pemasaran 1</option>
+                <option>XI Pemasaran 2</option>
+                <option>XII Pemasaran 1</option>
+                <option>XII Pemasaran 2</option>
+              </select>
+            </div>
+          </div>
+          <button onclick="startApp()" class="btn-primary w-full">
+            Mulai Belajar →
+          </button>
+        </div>
+
+        <div class="mt-8 grid grid-cols-3 gap-3 max-w-md mx-auto text-center">
+          <div class="card-market p-3">
+            <div class="text-2xl mb-1">📖</div>
+            <div class="text-xs font-bold">5 Materi</div>
+            <div class="text-xs text-stone-500">Bahan ajar</div>
+          </div>
+          <div class="card-market p-3">
+            <div class="text-2xl mb-1">🎮</div>
+            <div class="text-xs font-bold">2 Simulasi</div>
+            <div class="text-xs text-stone-500">Drag & drop</div>
+          </div>
+          <div class="card-market p-3">
+            <div class="text-2xl mb-1">🎯</div>
+            <div class="text-xs font-bold">10 Soal</div>
+            <div class="text-xs text-stone-500">Evaluasi</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PAGE: MENU UTAMA ===== -->
+      <section id="page-menu-utama" class="page-section">
+        <div class="mb-8">
+          <div class="badge-tag inline-block mb-3">Dashboard</div>
+          <h1 class="font-display text-4xl font-black">Menu Utama</h1>
+          <p class="text-stone-400 text-sm mt-1">
+            Pilih modul yang ingin kamu pelajari
+          </p>
+        </div>
+
+        <!-- Progress overview -->
+        <div class="card-market p-5 mb-6">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-bold">Progress Belajar</span>
+            <span class="font-mono text-xs text-amber-400" id="progress-pct"
+              >0%</span
+            >
+          </div>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progress-bar"
+              style="width: 0%"
+            ></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 mt-4 text-center text-xs">
+            <div>
+              <span class="text-amber-400 font-bold font-mono" id="stat-materi"
+                >0</span
+              ><br /><span class="text-stone-500">Materi dibaca</span>
+            </div>
+            <div>
+              <span class="text-amber-400 font-bold font-mono" id="stat-sim"
+                >0</span
+              ><br /><span class="text-stone-500">Simulasi selesai</span>
+            </div>
+            <div>
+              <span class="text-amber-400 font-bold font-mono" id="stat-skor"
+                >0</span
+              ><br /><span class="text-stone-500">Total poin</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div
+            class="card-market p-5 cursor-pointer"
+            onclick="goTo('pendahuluan')"
+          >
+            <div class="flex items-start gap-4">
+              <div
+                class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-2xl flex-shrink-0"
+              >
+                📘
+              </div>
+              <div>
+                <div class="badge-tag mb-2">Modul 1</div>
+                <h3 class="font-display font-black text-base">Pendahuluan</h3>
+                <p class="text-stone-400 text-xs mt-1">
+                  Pengertian jual beli, pasar, dan peran pemasar dalam ekonomi
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="card-market p-5 cursor-pointer" onclick="goTo('materi')">
+            <div class="flex items-start gap-4">
+              <div
+                class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-2xl flex-shrink-0"
+              >
+                📊
+              </div>
+              <div>
+                <div class="badge-tag mb-2">Modul 2</div>
+                <h3 class="font-display font-black text-base">
+                  Alur Proses Jual Beli
+                </h3>
+                <p class="text-stone-400 text-xs mt-1">
+                  Tahapan lengkap dari promosi hingga serah terima barang
+                </p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="card-market p-5 cursor-pointer"
+            onclick="goTo('simulasi')"
+          >
+            <div class="flex items-start gap-4">
+              <div
+                class="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-2xl flex-shrink-0"
+              >
+                🎮
+              </div>
+              <div>
+                <div
+                  class="badge-tag mb-2"
+                  style="
+                    color: #fb923c;
+                    border-color: rgba(251, 146, 60, 0.3);
+                    background: rgba(251, 146, 60, 0.1);
+                  "
+                >
+                  Simulasi
+                </div>
+                <h3 class="font-display font-black text-base">
+                  Simulasi Pasar
+                </h3>
+                <p class="text-stone-400 text-xs mt-1">
+                  Susun alur transaksi dan klasifikasikan elemen pasar
+                </p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="card-market p-5 cursor-pointer"
+            onclick="goTo('evaluasi')"
+          >
+            <div class="flex items-start gap-4">
+              <div
+                class="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center text-2xl flex-shrink-0"
+              >
+                🎯
+              </div>
+              <div>
+                <div
+                  class="badge-tag mb-2"
+                  style="
+                    color: #4ade80;
+                    border-color: rgba(74, 222, 128, 0.3);
+                    background: rgba(74, 222, 128, 0.1);
+                  "
+                >
+                  Evaluasi
+                </div>
+                <h3 class="font-display font-black text-base">
+                  Uji Kompetensi
+                </h3>
+                <p class="text-stone-400 text-xs mt-1">
+                  10 soal pilihan ganda tentang proses jual beli
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PAGE: PENDAHULUAN ===== -->
+      <section id="page-pendahuluan" class="page-section">
+        <button onclick="goTo('menu-utama')" class="btn-secondary text-xs mb-6">
+          ← Kembali
+        </button>
+        <div class="badge-tag inline-block mb-3">Modul 1 · Pendahuluan</div>
+        <h1 class="font-display text-3xl font-black mb-6">
+          Mengenal Proses Jual Beli
+        </h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div class="card-market p-4 md:col-span-2">
+            <h3 class="font-bold text-amber-400 text-sm mb-3">
+              🏪 Apa itu Jual Beli?
+            </h3>
+            <p class="text-stone-300 text-sm leading-relaxed">
+              <strong>Jual beli</strong> adalah kesepakatan antara penjual dan
+              pembeli untuk memindahkan kepemilikan barang atau jasa dengan
+              imbalan uang atau alat tukar lainnya. Dalam Hukum Perdata
+              Indonesia, jual beli merupakan perjanjian yang bersifat konsensual
+              — terjadi saat ada kata sepakat antara kedua belah pihak.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="badge-tag">📦 Barang</span>
+              <span class="badge-tag">💰 Uang / Alat Tukar</span>
+              <span class="badge-tag">🤝 Kesepakatan</span>
+              <span class="badge-tag">👤 Penjual + Pembeli</span>
+            </div>
+          </div>
+          <div class="card-market p-4">
+            <h3 class="font-bold text-amber-400 text-sm mb-3">
+              📌 Unsur Jual Beli
+            </h3>
+            <ul class="text-sm space-y-2 text-stone-300">
+              <li class="flex gap-2">
+                <span class="text-amber-400">→</span> Ada pihak penjual
+              </li>
+              <li class="flex gap-2">
+                <span class="text-amber-400">→</span> Ada pihak pembeli
+              </li>
+              <li class="flex gap-2">
+                <span class="text-amber-400">→</span> Ada objek (barang/jasa)
+              </li>
+              <li class="flex gap-2">
+                <span class="text-amber-400">→</span> Ada harga yang disepakati
+              </li>
+              <li class="flex gap-2">
+                <span class="text-amber-400">→</span> Ada serah terima
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div class="card-market p-4">
+            <h3 class="font-bold text-amber-400 text-sm mb-3">
+              🗺️ Jenis Pasar
+            </h3>
+            <div class="space-y-3">
+              <div class="flex gap-3 items-start">
+                <span class="badge-tag flex-shrink-0">Konkret</span>
+                <span class="text-stone-300 text-xs"
+                  >Pasar fisik yang bisa dikunjungi langsung, seperti pasar
+                  tradisional, supermarket, mall</span
+                >
+              </div>
+              <div class="flex gap-3 items-start">
+                <span class="badge-tag flex-shrink-0">Abstrak</span>
+                <span class="text-stone-300 text-xs"
+                  >Pasar yang tidak memerlukan pertemuan fisik, seperti
+                  e-commerce, bursa saham</span
+                >
+              </div>
+              <div class="flex gap-3 items-start">
+                <span class="badge-tag flex-shrink-0">Monopoli</span>
+                <span class="text-stone-300 text-xs"
+                  >Hanya ada satu penjual, menguasai penuh pasar (contoh: PLN
+                  untuk listrik)</span
+                >
+              </div>
+              <div class="flex gap-3 items-start">
+                <span class="badge-tag flex-shrink-0">Oligopoli</span>
+                <span class="text-stone-300 text-xs"
+                  >Beberapa penjual besar yang mendominasi (contoh: provider
+                  telekomunikasi)</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="card-market p-4">
+            <h3 class="font-bold text-amber-400 text-sm mb-3">
+              👤 Peran Pemasar
+            </h3>
+            <p class="text-stone-300 text-sm mb-3">
+              Pemasar berfungsi sebagai jembatan antara produsen dan konsumen:
+            </p>
+            <div class="space-y-2 text-sm">
+              <div class="flex gap-2 items-center p-2 rounded-lg bg-stone-900">
+                <span>🔍</span
+                ><span class="text-stone-300">Riset kebutuhan pasar</span>
+              </div>
+              <div class="flex gap-2 items-center p-2 rounded-lg bg-stone-900">
+                <span>📣</span
+                ><span class="text-stone-300"
+                  >Promosi dan komunikasi produk</span
+                >
+              </div>
+              <div class="flex gap-2 items-center p-2 rounded-lg bg-stone-900">
+                <span>🤝</span
+                ><span class="text-stone-300">Negosiasi harga dan syarat</span>
+              </div>
+              <div class="flex gap-2 items-center p-2 rounded-lg bg-stone-900">
+                <span>📦</span
+                ><span class="text-stone-300"
+                  >Memastikan distribusi produk</span
+                >
+              </div>
+              <div class="flex gap-2 items-center p-2 rounded-lg bg-stone-900">
+                <span>💬</span
+                ><span class="text-stone-300">Layanan purna jual</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button
+            onclick="
+              completeMateri('pendahuluan');
+              goTo('materi');
+            "
+            class="btn-primary"
+          >
+            Lanjut ke Materi →
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== PAGE: MATERI ===== -->
+      <section id="page-materi" class="page-section">
+        <button onclick="goTo('menu-utama')" class="btn-secondary text-xs mb-6">
+          ← Kembali
+        </button>
+        <div class="badge-tag inline-block mb-3">Modul 2 · Alur Proses</div>
+        <h1 class="font-display text-3xl font-black mb-2">
+          Alur Proses Jual Beli
+        </h1>
+        <p class="text-stone-400 text-sm mb-8">
+          Klik setiap tahap untuk melihat penjelasan detailnya
+        </p>
+
+        <!-- Flowchart interaktif -->
+        <div class="card-market p-6 mb-8">
+          <!-- Desktop: horizontal flow -->
+          <div
+            class="hidden md:flex items-center gap-2 flex-wrap justify-center mb-6"
+          >
+            <div class="flow-node" id="fn-1" onclick="showStep(1)">
+              1. Identifikasi<br />Kebutuhan
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" id="fn-2" onclick="showStep(2)">
+              2. Mencari<br />Penjual
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" id="fn-3" onclick="showStep(3)">
+              3. Pemilihan<br />Produk
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" id="fn-4" onclick="showStep(4)">
+              4. Negosiasi<br />Harga
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" id="fn-5" onclick="showStep(5)">
+              5. Pembayaran
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" id="fn-6" onclick="showStep(6)">
+              6. Serah Terima<br />Barang
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" id="fn-7" onclick="showStep(7)">
+              7. Purna<br />Jual
+            </div>
+          </div>
+
+          <!-- Mobile: vertical flow -->
+          <div class="md:hidden flex flex-col items-center gap-1 mb-6">
+            <div
+              class="flow-node w-full text-center"
+              id="fn-1m"
+              onclick="showStep(1)"
+            >
+              1. Identifikasi Kebutuhan
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div
+              class="flow-node w-full text-center"
+              id="fn-2m"
+              onclick="showStep(2)"
+            >
+              2. Mencari Penjual
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div
+              class="flow-node w-full text-center"
+              id="fn-3m"
+              onclick="showStep(3)"
+            >
+              3. Pemilihan Produk
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div
+              class="flow-node w-full text-center"
+              id="fn-4m"
+              onclick="showStep(4)"
+            >
+              4. Negosiasi Harga
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div
+              class="flow-node w-full text-center"
+              id="fn-5m"
+              onclick="showStep(5)"
+            >
+              5. Pembayaran
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div
+              class="flow-node w-full text-center"
+              id="fn-6m"
+              onclick="showStep(6)"
+            >
+              6. Serah Terima Barang
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div
+              class="flow-node w-full text-center"
+              id="fn-7m"
+              onclick="showStep(7)"
+            >
+              7. Purna Jual
+            </div>
+          </div>
+
+          <!-- Step detail box -->
+          <div
+            id="step-detail"
+            class="rounded-xl p-5 border border-amber-500/30 bg-amber-500/5 hidden"
+          >
+            <div class="flex items-start gap-4">
+              <div class="text-3xl" id="step-icon">📌</div>
+              <div>
+                <h3
+                  class="font-display font-black text-amber-400 text-lg"
+                  id="step-title"
+                >
+                  Judul
+                </h3>
+                <p
+                  class="text-stone-300 text-sm mt-2 leading-relaxed"
+                  id="step-desc"
+                >
+                  Deskripsi
+                </p>
+                <div class="mt-3 flex flex-wrap gap-2" id="step-tags"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion materi tambahan -->
+        <h2 class="font-display font-black text-xl mb-4">Materi Pendukung</h2>
+        <div class="space-y-3 mb-8">
+          <div class="card-market overflow-hidden">
+            <button
+              class="w-full text-left px-5 py-4 flex items-center justify-between"
+              onclick="toggleAccordion('acc1')"
+            >
+              <span class="font-bold text-sm"
+                >💳 Metode Pembayaran dalam Jual Beli</span
+              >
+              <span class="text-amber-400 text-lg" id="acc1-icon">+</span>
+            </button>
+            <div class="accordion-body px-5 pb-5" id="acc1">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div class="bg-stone-900 rounded-lg p-3">
+                  <div class="font-bold text-amber-400 mb-1">
+                    💵 Tunai (Cash)
+                  </div>
+                  <p class="text-stone-400 text-xs">
+                    Pembayaran langsung dengan uang fisik saat transaksi. Aman
+                    dan tidak ada biaya tambahan.
+                  </p>
+                </div>
+                <div class="bg-stone-900 rounded-lg p-3">
+                  <div class="font-bold text-amber-400 mb-1">
+                    🏦 Transfer Bank
+                  </div>
+                  <p class="text-stone-400 text-xs">
+                    Pemindahan dana antar rekening. Umum digunakan untuk
+                    transaksi besar atau online.
+                  </p>
+                </div>
+                <div class="bg-stone-900 rounded-lg p-3">
+                  <div class="font-bold text-amber-400 mb-1">
+                    💳 Kartu Debit/Kredit
+                  </div>
+                  <p class="text-stone-400 text-xs">
+                    Menggunakan kartu elektronik. Kredit memungkinkan pembayaran
+                    dicicil.
+                  </p>
+                </div>
+                <div class="bg-stone-900 rounded-lg p-3">
+                  <div class="font-bold text-amber-400 mb-1">
+                    📱 E-Wallet / QRIS
+                  </div>
+                  <p class="text-stone-400 text-xs">
+                    Dompet digital seperti GoPay, OVO, DANA. Praktis untuk
+                    transaksi sehari-hari.
+                  </p>
+                </div>
+                <div class="bg-stone-900 rounded-lg p-3">
+                  <div class="font-bold text-amber-400 mb-1">
+                    📄 COD (Cash on Delivery)
+                  </div>
+                  <p class="text-stone-400 text-xs">
+                    Bayar saat barang sudah diterima. Populer di platform
+                    e-commerce.
+                  </p>
+                </div>
+                <div class="bg-stone-900 rounded-lg p-3">
+                  <div class="font-bold text-amber-400 mb-1">
+                    📃 Kredit / Angsuran
+                  </div>
+                  <p class="text-stone-400 text-xs">
+                    Pembayaran bertahap sesuai kesepakatan. Ada bunga yang perlu
+                    diperhatikan.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-market overflow-hidden">
+            <button
+              class="w-full text-left px-5 py-4 flex items-center justify-between"
+              onclick="toggleAccordion('acc2')"
+            >
+              <span class="font-bold text-sm">🤝 Teknik Negosiasi Harga</span>
+              <span class="text-amber-400 text-lg" id="acc2-icon">+</span>
+            </button>
+            <div class="accordion-body px-5 pb-5" id="acc2">
+              <p class="text-stone-400 text-sm mb-3">
+                Negosiasi adalah proses komunikasi dua arah untuk mencapai
+                kesepakatan harga yang menguntungkan kedua pihak.
+              </p>
+              <div class="space-y-2 text-sm">
+                <div class="flex gap-3 items-start p-3 bg-stone-900 rounded-lg">
+                  <span
+                    class="text-amber-400 font-bold text-xs w-6 flex-shrink-0"
+                    >01</span
+                  >
+                  <div>
+                    <strong>Riset harga pasar</strong> — Ketahui harga wajar
+                    sebelum bernegosiasi agar punya posisi tawar yang kuat
+                  </div>
+                </div>
+                <div class="flex gap-3 items-start p-3 bg-stone-900 rounded-lg">
+                  <span
+                    class="text-amber-400 font-bold text-xs w-6 flex-shrink-0"
+                    >02</span
+                  >
+                  <div>
+                    <strong>Buka dengan tawaran realistis</strong> — Jangan
+                    terlalu rendah atau terlalu tinggi, cari titik tengah
+                  </div>
+                </div>
+                <div class="flex gap-3 items-start p-3 bg-stone-900 rounded-lg">
+                  <span
+                    class="text-amber-400 font-bold text-xs w-6 flex-shrink-0"
+                    >03</span
+                  >
+                  <div>
+                    <strong>Tonjolkan nilai, bukan harga</strong> — Jelaskan
+                    manfaat produk, bukan sekadar minta diskon
+                  </div>
+                </div>
+                <div class="flex gap-3 items-start p-3 bg-stone-900 rounded-lg">
+                  <span
+                    class="text-amber-400 font-bold text-xs w-6 flex-shrink-0"
+                    >04</span
+                  >
+                  <div>
+                    <strong>BATNA</strong> — Selalu punya alternatif (Best
+                    Alternative To Negotiated Agreement)
+                  </div>
+                </div>
+                <div class="flex gap-3 items-start p-3 bg-stone-900 rounded-lg">
+                  <span
+                    class="text-amber-400 font-bold text-xs w-6 flex-shrink-0"
+                    >05</span
+                  >
+                  <div>
+                    <strong>Win-win solution</strong> — Tujuan negosiasi adalah
+                    kedua pihak merasa puas, bukan satu pihak menang
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-market overflow-hidden">
+            <button
+              class="w-full text-left px-5 py-4 flex items-center justify-between"
+              onclick="toggleAccordion('acc3')"
+            >
+              <span class="font-bold text-sm"
+                >📄 Dokumen Transaksi Jual Beli</span
+              >
+              <span class="text-amber-400 text-lg" id="acc3-icon">+</span>
+            </button>
+            <div class="accordion-body px-5 pb-5" id="acc3">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                <div class="bg-stone-900 rounded-lg p-3 text-center">
+                  <div class="text-2xl mb-2">🧾</div>
+                  <div class="font-bold text-amber-400 mb-1">
+                    Nota / Kwitansi
+                  </div>
+                  <p class="text-stone-400 text-xs">
+                    Bukti transaksi sederhana, berisi nama barang, jumlah,
+                    harga, dan tanda tangan penjual
+                  </p>
+                </div>
+                <div class="bg-stone-900 rounded-lg p-3 text-center">
+                  <div class="text-2xl mb-2">📋</div>
+                  <div class="font-bold text-amber-400 mb-1">
+                    Faktur / Invoice
+                  </div>
+                  <p class="text-stone-400 text-xs">
+                    Tagihan resmi dari penjual ke pembeli, berisi detail lengkap
+                    transaksi dan syarat pembayaran
+                  </p>
+                </div>
+                <div class="bg-stone-900 rounded-lg p-3 text-center">
+                  <div class="text-2xl mb-2">📝</div>
+                  <div class="font-bold text-amber-400 mb-1">
+                    Surat Pesanan (PO)
+                  </div>
+                  <p class="text-stone-400 text-xs">
+                    Purchase Order — dokumen dari pembeli ke penjual berisi
+                    permintaan resmi barang yang ingin dibeli
+                  </p>
+                </div>
+                <div class="bg-stone-900 rounded-lg p-3 text-center">
+                  <div class="text-2xl mb-2">📦</div>
+                  <div class="font-bold text-amber-400 mb-1">Surat Jalan</div>
+                  <p class="text-stone-400 text-xs">
+                    Dokumen yang menyertai pengiriman barang, sebagai bukti
+                    bahwa barang telah dikirim
+                  </p>
+                </div>
+                <div class="bg-stone-900 rounded-lg p-3 text-center">
+                  <div class="text-2xl mb-2">✅</div>
+                  <div class="font-bold text-amber-400 mb-1">BAST</div>
+                  <p class="text-stone-400 text-xs">
+                    Berita Acara Serah Terima — tanda bukti barang sudah
+                    diterima pembeli dalam kondisi baik
+                  </p>
+                </div>
+                <div class="bg-stone-900 rounded-lg p-3 text-center">
+                  <div class="text-2xl mb-2">🔄</div>
+                  <div class="font-bold text-amber-400 mb-1">Nota Retur</div>
+                  <p class="text-stone-400 text-xs">
+                    Dokumen pengembalian barang jika ada kerusakan atau tidak
+                    sesuai pesanan
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-market overflow-hidden">
+            <button
+              class="w-full text-left px-5 py-4 flex items-center justify-between"
+              onclick="toggleAccordion('acc4')"
+            >
+              <span class="font-bold text-sm"
+                >🛒 Jual Beli Online vs Offline</span
+              >
+              <span class="text-amber-400 text-lg" id="acc4-icon">+</span>
+            </button>
+            <div class="accordion-body px-5 pb-5" id="acc4">
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <h4 class="font-bold text-amber-400 mb-3">
+                    🏪 Offline (Konvensional)
+                  </h4>
+                  <ul class="space-y-2 text-stone-300">
+                    <li class="flex gap-2">
+                      ✓ Bisa lihat/pegang barang langsung
+                    </li>
+                    <li class="flex gap-2">✓ Bisa negosiasi langsung</li>
+                    <li class="flex gap-2">✓ Barang langsung diterima</li>
+                    <li class="flex gap-2">✗ Terbatas area geografis</li>
+                    <li class="flex gap-2">✗ Jam operasional terbatas</li>
+                    <li class="flex gap-2">✗ Biaya operasional toko tinggi</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-bold text-amber-400 mb-3">
+                    💻 Online (E-Commerce)
+                  </h4>
+                  <ul class="space-y-2 text-stone-300">
+                    <li class="flex gap-2">✓ Jangkauan pasar luas</li>
+                    <li class="flex gap-2">✓ 24 jam bisa transaksi</li>
+                    <li class="flex gap-2">✓ Biaya operasional lebih rendah</li>
+                    <li class="flex gap-2">✗ Tidak bisa cek fisik barang</li>
+                    <li class="flex gap-2">✗ Risiko penipuan lebih tinggi</li>
+                    <li class="flex gap-2">✗ Perlu waktu pengiriman</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button
+            onclick="
+              completeMateri('materi');
+              goTo('simulasi');
+            "
+            class="btn-primary"
+          >
+            Lanjut ke Simulasi →
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== PAGE: SIMULASI ===== -->
+      <section id="page-simulasi" class="page-section">
+        <button onclick="goTo('menu-utama')" class="btn-secondary text-xs mb-6">
+          ← Kembali
+        </button>
+        <div class="badge-tag inline-block mb-3">Simulasi Interaktif</div>
+        <h1 class="font-display text-3xl font-black mb-2">Simulasi Pasar</h1>
+        <p class="text-stone-400 text-sm mb-6">
+          Pilih simulasi yang ingin dimainkan
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div
+            class="card-market p-5 cursor-pointer hover:border-amber-500"
+            onclick="showSim(1)"
+          >
+            <div class="text-3xl mb-3">🧩</div>
+            <h3 class="font-display font-black text-base mb-1">
+              Simulasi 1: Susun Alur Transaksi
+            </h3>
+            <p class="text-stone-400 text-xs">
+              Drag & drop tahapan jual beli ke urutan yang benar
+            </p>
+            <div class="mt-3 flex gap-2">
+              <span class="badge-tag">Drag & Drop</span>
+              <span class="badge-tag">+50 poin</span>
+            </div>
+          </div>
+          <div
+            class="card-market p-5 cursor-pointer hover:border-amber-500"
+            onclick="showSim(2)"
+          >
+            <div class="text-3xl mb-3">🗂️</div>
+            <h3 class="font-display font-black text-base mb-1">
+              Simulasi 2: Klasifikasi Elemen Pasar
+            </h3>
+            <p class="text-stone-400 text-xs">
+              Kelompokkan item ke kategori Penjual, Pembeli, atau Dokumen
+            </p>
+            <div class="mt-3 flex gap-2">
+              <span class="badge-tag">Klasifikasi</span>
+              <span class="badge-tag">+60 poin</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulasi 1 -->
+        <div id="sim1-container" class="hidden">
+          <div class="card-market p-6 mb-4">
+            <h3 class="font-display font-black text-lg mb-1">
+              🧩 Susun Alur Transaksi
+            </h3>
+            <p class="text-stone-400 text-xs mb-4">
+              Drag kartu di bawah ke kotak urutan yang benar (1 sampai 6)
+            </p>
+
+            <div
+              class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6"
+              id="sim1-cards"
+            >
+              <!-- Generated by JS -->
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="sim1-slots">
+              <!-- Generated by JS -->
+            </div>
+
+            <div
+              id="sim1-feedback"
+              class="mt-4 hidden rounded-lg p-4 text-sm font-semibold"
+            ></div>
+            <div class="mt-4 flex gap-3">
+              <button onclick="checkSim1()" class="btn-primary text-sm">
+                ✓ Cek Jawaban
+              </button>
+              <button onclick="resetSim1()" class="btn-secondary text-sm">
+                ↺ Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulasi 2 -->
+        <div id="sim2-container" class="hidden">
+          <div class="card-market p-6 mb-4">
+            <h3 class="font-display font-black text-lg mb-1">
+              🗂️ Klasifikasi Elemen Pasar
+            </h3>
+            <p class="text-stone-400 text-xs mb-4">
+              Drag setiap item ke kategori yang tepat
+            </p>
+
+            <div class="flex flex-wrap gap-3 mb-6" id="sim2-items">
+              <!-- Generated by JS -->
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <div class="text-sm font-bold text-amber-400 mb-2">
+                  👤 Penjual
+                </div>
+                <div
+                  class="drop-zone"
+                  id="dz-penjual"
+                  ondragover="dzOver(event)"
+                  ondragleave="dzLeave(event)"
+                  ondrop="dzDrop(event, 'penjual')"
+                >
+                  <span
+                    class="text-stone-600 text-xs self-center w-full text-center"
+                    >Drop di sini</span
+                  >
+                </div>
+              </div>
+              <div>
+                <div class="text-sm font-bold text-amber-400 mb-2">
+                  🛒 Pembeli
+                </div>
+                <div
+                  class="drop-zone"
+                  id="dz-pembeli"
+                  ondragover="dzOver(event)"
+                  ondragleave="dzLeave(event)"
+                  ondrop="dzDrop(event, 'pembeli')"
+                >
+                  <span
+                    class="text-stone-600 text-xs self-center w-full text-center"
+                    >Drop di sini</span
+                  >
+                </div>
+              </div>
+              <div>
+                <div class="text-sm font-bold text-amber-400 mb-2">
+                  📄 Dokumen
+                </div>
+                <div
+                  class="drop-zone"
+                  id="dz-dokumen"
+                  ondragover="dzOver(event)"
+                  ondragleave="dzLeave(event)"
+                  ondrop="dzDrop(event, 'dokumen')"
+                >
+                  <span
+                    class="text-stone-600 text-xs self-center w-full text-center"
+                    >Drop di sini</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div
+              id="sim2-feedback"
+              class="mt-4 hidden rounded-lg p-4 text-sm font-semibold"
+            ></div>
+            <div class="mt-4 flex gap-3">
+              <button onclick="checkSim2()" class="btn-primary text-sm">
+                ✓ Cek Jawaban
+              </button>
+              <button onclick="resetSim2()" class="btn-secondary text-sm">
+                ↺ Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PAGE: EVALUASI ===== -->
+      <section id="page-evaluasi" class="page-section">
+        <button onclick="goTo('menu-utama')" class="btn-secondary text-xs mb-6">
+          ← Kembali
+        </button>
+        <div class="badge-tag inline-block mb-3">Evaluasi</div>
+        <h1 class="font-display text-3xl font-black mb-2">Uji Kompetensi</h1>
+
+        <div id="quiz-start" class="card-market p-6 max-w-lg">
+          <h3 class="font-display font-black text-xl mb-2">
+            Siap uji kemampuan?
+          </h3>
+          <p class="text-stone-400 text-sm mb-4">
+            10 soal pilihan ganda tentang proses jual beli. Setiap soal benar =
+            +10 poin.
+          </p>
+          <div class="flex gap-3 text-sm mb-5">
+            <div class="card-market p-3 text-center flex-1">
+              <div class="text-amber-400 font-bold">10</div>
+              <div class="text-stone-500 text-xs">Soal</div>
+            </div>
+            <div class="card-market p-3 text-center flex-1">
+              <div class="text-amber-400 font-bold">+10</div>
+              <div class="text-stone-500 text-xs">Poin/soal</div>
+            </div>
+            <div class="card-market p-3 text-center flex-1">
+              <div class="text-amber-400 font-bold">≥70</div>
+              <div class="text-stone-500 text-xs">Min. lulus</div>
+            </div>
+          </div>
+          <button onclick="startQuiz()" class="btn-primary w-full">
+            Mulai Evaluasi
+          </button>
+        </div>
+
+        <div id="quiz-container" class="hidden max-w-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <div class="text-sm text-stone-400">
+              Soal
+              <span id="q-num" class="text-amber-400 font-bold">1</span> dari 10
+            </div>
+            <div class="score-badge">⭐ <span id="q-score">0</span></div>
+          </div>
+          <div class="progress-bar mb-6">
+            <div class="progress-fill" id="q-progress" style="width: 0%"></div>
+          </div>
+
+          <div class="card-market p-6 mb-4">
+            <p class="font-bold text-base mb-5" id="q-text">Soal loading...</p>
+            <div class="space-y-3" id="q-options"></div>
+          </div>
+          <div
+            id="q-feedback"
+            class="hidden card-market p-4 mb-4 text-sm"
+          ></div>
+          <button
+            onclick="nextQuestion()"
+            id="q-next"
+            class="btn-primary hidden"
+          >
+            Soal Berikutnya →
+          </button>
+        </div>
+
+        <div id="quiz-result" class="hidden max-w-lg">
+          <div class="card-market p-8 text-center">
+            <div class="text-5xl mb-4" id="result-emoji">🎉</div>
+            <h2 class="font-display font-black text-3xl mb-2" id="result-title">
+              Luar Biasa!
+            </h2>
+            <p class="text-stone-400 text-sm mb-6" id="result-desc">
+              Kamu menguasai materi dengan baik
+            </p>
+            <div class="grid grid-cols-3 gap-3 mb-6">
+              <div class="bg-stone-900 rounded-lg p-3">
+                <div
+                  class="text-amber-400 font-bold font-mono text-xl"
+                  id="result-score"
+                >
+                  0
+                </div>
+                <div class="text-stone-500 text-xs">Poin</div>
+              </div>
+              <div class="bg-stone-900 rounded-lg p-3">
+                <div
+                  class="text-amber-400 font-bold font-mono text-xl"
+                  id="result-correct"
+                >
+                  0
+                </div>
+                <div class="text-stone-500 text-xs">Benar</div>
+              </div>
+              <div class="bg-stone-900 rounded-lg p-3">
+                <div
+                  class="text-amber-400 font-bold font-mono text-xl"
+                  id="result-pct"
+                >
+                  0%
+                </div>
+                <div class="text-stone-500 text-xs">Nilai</div>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <button onclick="restartQuiz()" class="btn-secondary flex-1">
+                Ulangi
+              </button>
+              <button onclick="goTo('menu-utama')" class="btn-primary flex-1">
+                Ke Menu
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PAGE: PROFIL PEMBUAT ===== -->
+      <section id="page-profil" class="page-section">
+        <button onclick="goTo('menu-utama')" class="btn-secondary text-xs mb-6">
+          ← Kembali
+        </button>
+        <div class="max-w-lg">
+          <div class="badge-tag inline-block mb-3">Tentang</div>
+          <h1 class="font-display text-3xl font-black mb-6">Profil Pembuat</h1>
+          <div class="card-market p-6">
+            <div class="flex items-start gap-4 mb-5">
+              <div
+                class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-3xl flex-shrink-0"
+              >
+                👤
+              </div>
+              <div>
+                <h3 class="font-display font-black text-xl">Nama Pembuat</h3>
+                <p class="text-stone-400 text-sm">
+                  Guru Pemasaran / Pengembang Media
+                </p>
+                <div class="flex gap-2 mt-2">
+                  <span class="badge-tag">SMK Pemasaran</span>
+                </div>
+              </div>
+            </div>
+            <div class="space-y-3 text-sm text-stone-300">
+              <div class="flex gap-3 p-3 bg-stone-900 rounded-lg">
+                <span>🏫</span>
+                <div><strong>Sekolah:</strong> SMK Negeri / SMK Swasta</div>
+              </div>
+              <div class="flex gap-3 p-3 bg-stone-900 rounded-lg">
+                <span>📧</span>
+                <div><strong>Email:</strong> pembuat@sekolah.sch.id</div>
+              </div>
+              <div class="flex gap-3 p-3 bg-stone-900 rounded-lg">
+                <span>📚</span>
+                <div>
+                  <strong>Mata Pelajaran:</strong> Pemasaran &amp; Perdagangan
+                </div>
+              </div>
+            </div>
+            <p class="text-stone-500 text-xs mt-4">
+              Media pembelajaran ini dibuat sebagai bahan ajar digital
+              interaktif untuk meningkatkan pemahaman siswa tentang proses jual
+              beli di dunia nyata.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom nav for mobile hint -->
+    <div
+      id="bottom-bar"
+      class="hidden fixed bottom-0 left-0 right-0 z-40 bg-stone-950/90 border-t border-stone-800 backdrop-blur-md py-2 px-4"
+    >
+      <div class="max-w-6xl mx-auto flex justify-around">
+        <button
+          onclick="goTo('menu-utama')"
+          class="flex flex-col items-center gap-1 text-stone-500 hover:text-amber-400 transition-colors text-xs"
+        >
+          <span class="text-lg">🏠</span>Menu
+        </button>
+        <button
+          onclick="goTo('pendahuluan')"
+          class="flex flex-col items-center gap-1 text-stone-500 hover:text-amber-400 transition-colors text-xs"
+        >
+          <span class="text-lg">📘</span>Materi
+        </button>
+        <button
+          onclick="goTo('simulasi')"
+          class="flex flex-col items-center gap-1 text-stone-500 hover:text-amber-400 transition-colors text-xs"
+        >
+          <span class="text-lg">🎮</span>Simulasi
+        </button>
+        <button
+          onclick="goTo('evaluasi')"
+          class="flex flex-col items-center gap-1 text-stone-500 hover:text-amber-400 transition-colors text-xs"
+        >
+          <span class="text-lg">🎯</span>Evaluasi
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // ============================
+      // STATE
+      // ============================
+      let state = {
+        name: "",
+        kelas: "",
+        score: 0,
+        materiDone: new Set(),
+        simDone: new Set(),
+      };
+
+      // ============================
+      // TICKER BACKGROUND
+      // ============================
+      function initTicker() {
+        const bg = document.getElementById("ticker-bg");
+        const texts = [
+          "JUAL BELI",
+          "NEGOSIASI",
+          "PASAR",
+          "TRANSAKSI",
+          "INVOICE",
+          "DISTRIBUSI",
+          "KONSUMEN",
+          "PRODUSEN",
+          "PEMBAYARAN",
+          "PEMASARAN",
+        ];
+        for (let i = 0; i < 8; i++) {
+          const line = document.createElement("div");
+          line.className = "ticker-line";
+          line.style.top = `${i * 14}%`;
+          line.style.animationDuration = `${30 + i * 7}s`;
+          line.style.animationDelay = `-${i * 4}s`;
+          let content = "";
+          for (let j = 0; j < 20; j++)
+            content += texts[Math.floor(Math.random() * texts.length)] + " · ";
+          line.textContent = content + content;
+          bg.appendChild(line);
+        }
+      }
+
+      // ============================
+      // NAVIGATION
+      // ============================
+      function goTo(page) {
+        document
+          .querySelectorAll(".page-section")
+          .forEach((s) => s.classList.remove("active"));
+        const target = document.getElementById("page-" + page);
+        if (target) {
+          target.classList.add("active");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+        updateStats();
+      }
+
+      function startApp() {
+        const name = document.getElementById("input-name").value.trim();
+        const kelas = document.getElementById("input-kelas").value;
+        if (!name) {
+          showToast("Oops!", "Masukkan nama dulu bro", "error");
+          return;
+        }
+        if (!kelas) {
+          showToast("Oops!", "Pilih kelasmu dulu", "error");
+          return;
+        }
+        state.name = name;
+        state.kelas = kelas;
+        document.getElementById("header-name").textContent = name;
+        document.getElementById("app-header").classList.remove("hidden");
+        document.getElementById("bottom-bar").classList.remove("hidden");
+        goTo("menu-utama");
+        showToast("Welcome!", `Semangat belajar, ${name}! 🔥`, "success");
+      }
+
+      // ============================
+      // STATS
+      // ============================
+      function updateStats() {
+        const total = state.materiDone.size + state.simDone.size;
+        const max = 4;
+        const pct = Math.round((total / max) * 100);
+        const el = document.getElementById("progress-bar");
+        const elpct = document.getElementById("progress-pct");
+        if (el) {
+          el.style.width = pct + "%";
+        }
+        if (elpct) {
+          elpct.textContent = pct + "%";
+        }
+        const sm = document.getElementById("stat-materi");
+        const ss = document.getElementById("stat-sim");
+        const sc = document.getElementById("stat-skor");
+        if (sm) sm.textContent = state.materiDone.size;
+        if (ss) ss.textContent = state.simDone.size;
+        if (sc) sc.textContent = state.score;
+        document.getElementById("header-score").textContent = state.score;
+      }
+
+      function addScore(pts) {
+        state.score += pts;
+        updateStats();
+      }
+
+      function completeMateri(key) {
+        if (!state.materiDone.has(key)) {
+          state.materiDone.add(key);
+          addScore(15);
+          showToast("✓ Materi Selesai!", `+15 poin kamu dapet`, "success");
+        }
+      }
+
+      // ============================
+      // STEP FLOWCHART
+      // ============================
+      const steps = [
+        {
+          icon: "🔍",
+          title: "1. Identifikasi Kebutuhan",
+          desc: "Proses dimulai ketika konsumen menyadari adanya kebutuhan atau keinginan. Misalnya, seseorang menyadari laptopnya sudah rusak dan membutuhkan yang baru. Kebutuhan bisa datang dari dorongan internal (lapar, butuh transportasi) maupun eksternal (iklan, rekomendasi teman).",
+          tags: ["Kebutuhan", "Keinginan", "Motivasi Beli"],
+        },
+        {
+          icon: "🔎",
+          title: "2. Mencari Penjual",
+          desc: "Konsumen mulai mencari informasi tentang penjual atau produk yang bisa memenuhi kebutuhannya. Ini bisa dilakukan dengan browsing online, bertanya pada teman, mengunjungi toko, atau melihat iklan. Pemasar harus memastikan produknya mudah ditemukan di tahap ini.",
+          tags: ["Riset Pasar", "Perbandingan", "Sumber Informasi"],
+        },
+        {
+          icon: "🛍️",
+          title: "3. Pemilihan Produk",
+          desc: "Setelah menemukan beberapa pilihan, konsumen mengevaluasi dan memilih produk yang paling sesuai dengan kebutuhan, anggaran, dan preferensinya. Pemasar harus menonjolkan keunggulan produk di tahap ini melalui demonstrasi, testimoni, atau perbandingan fitur.",
+          tags: ["Evaluasi Alternatif", "Keputusan Beli", "USP"],
+        },
+        {
+          icon: "💬",
+          title: "4. Negosiasi Harga",
+          desc: "Penjual dan pembeli mendiskusikan harga dan syarat-syarat transaksi lainnya seperti metode pembayaran, waktu pengiriman, garansi, dan diskon. Tidak semua transaksi melalui tahap ini (harga fixed), tapi untuk B2B atau pasar tradisional, negosiasi sangat umum.",
+          tags: ["Tawar Menawar", "Harga", "Syarat Transaksi"],
+        },
+        {
+          icon: "💳",
+          title: "5. Pembayaran",
+          desc: "Setelah harga dan syarat disepakati, pembeli melakukan pembayaran sesuai metode yang disepakati — tunai, transfer, kartu, atau kredit. Di tahap ini dokumen seperti kwitansi atau bukti transfer disiapkan. Pembayaran menandai terjadi nya perjanjian jual beli secara resmi.",
+          tags: ["Cash", "Transfer", "E-wallet", "Kredit"],
+        },
+        {
+          icon: "📦",
+          title: "6. Serah Terima Barang",
+          desc: "Penjual menyerahkan barang kepada pembeli disertai dokumen pendukung (surat jalan, faktur, BAST). Pembeli wajib memeriksa kondisi barang saat diterima. Jika ada kerusakan atau ketidaksesuaian, bisa dilakukan klaim retur berdasarkan perjanjian sebelumnya.",
+          tags: ["Pengiriman", "Cek Barang", "Surat Jalan", "BAST"],
+        },
+        {
+          icon: "🔧",
+          title: "7. Purna Jual",
+          desc: "Hubungan penjual-pembeli tidak berakhir setelah transaksi. Layanan purna jual meliputi garansi, servis, penanganan komplain, dan program loyalitas pelanggan. Pemasar yang baik menjaga hubungan jangka panjang karena pelanggan lama lebih mudah dipertahankan daripada mencari pelanggan baru.",
+          tags: ["Garansi", "Servis", "Customer Retention", "CRM"],
+        },
+      ];
+
+      function showStep(n) {
+        // Remove all active
+        for (let i = 1; i <= 7; i++) {
+          const d = document.getElementById("fn-" + i);
+          const dm = document.getElementById("fn-" + i + "m");
+          if (d) d.classList.remove("active");
+          if (dm) dm.classList.remove("active");
+        }
+        document.getElementById("fn-" + n)?.classList.add("active");
+        document.getElementById("fn-" + n + "m")?.classList.add("active");
+        const s = steps[n - 1];
+        document.getElementById("step-icon").textContent = s.icon;
+        document.getElementById("step-title").textContent = s.title;
+        document.getElementById("step-desc").textContent = s.desc;
+        const tagEl = document.getElementById("step-tags");
+        tagEl.innerHTML = s.tags
+          .map((t) => `<span class="badge-tag">${t}</span>`)
+          .join("");
+        document.getElementById("step-detail").classList.remove("hidden");
+      }
+
+      // ============================
+      // ACCORDION
+      // ============================
+      function toggleAccordion(id) {
+        const body = document.getElementById(id);
+        const icon = document.getElementById(id + "-icon");
+        if (body.classList.contains("open")) {
+          body.classList.remove("open");
+          icon.textContent = "+";
+        } else {
+          body.classList.add("open");
+          icon.textContent = "−";
+        }
+      }
+
+      // ============================
+      // SIMULASI 1: Susun urutan
+      // ============================
+      const sim1Data = [
+        { id: "s1a", text: "📦 Serah Terima Barang", order: 6 },
+        { id: "s1b", text: "🔍 Identifikasi Kebutuhan", order: 1 },
+        { id: "s1c", text: "💳 Pembayaran", order: 5 },
+        { id: "s1d", text: "🛍️ Pemilihan Produk", order: 3 },
+        { id: "s1e", text: "💬 Negosiasi Harga", order: 4 },
+        { id: "s1f", text: "🔎 Mencari Penjual", order: 2 },
+      ];
+      let sim1Slots = Array(6).fill(null);
+      let sim1Dragging = null;
+
+      function renderSim1() {
+        const cardsEl = document.getElementById("sim1-cards");
+        const slotsEl = document.getElementById("sim1-slots");
+
+        // Shuffle for display
+        const placed = sim1Slots.filter(Boolean).map((x) => x.id);
+        const remaining = sim1Data.filter((d) => !placed.includes(d.id));
+
+        cardsEl.innerHTML = remaining
+          .map(
+            (item) => `
+    <div class="drag-item" draggable="true" id="card-${item.id}"
+      ondragstart="sim1DragStart('${item.id}')"
+      ondragend="sim1DragEnd()"
+    >${item.text}</div>
+  `,
+          )
+          .join("");
+
+        slotsEl.innerHTML = Array(6)
+          .fill(0)
+          .map(
+            (_, i) => `
+    <div class="drop-zone items-center justify-center relative" style="min-height:56px"
+      ondragover="sim1Over(event,${i})" ondragleave="sim1Leave(event)" ondrop="sim1Drop(event,${i})">
+      <span class="absolute top-1 left-2 text-stone-700 font-mono text-xs font-bold">${i + 1}</span>
+      ${
+        sim1Slots[i]
+          ? `<div class="placed-item cursor-pointer" onclick="sim1Remove(${i})">${sim1Slots[i].text} ✕</div>`
+          : `<span class="text-stone-700 text-xs">Urutan ${i + 1}</span>`
+      }
+    </div>
+  `,
+          )
+          .join("");
+      }
+
+      function sim1DragStart(id) {
+        sim1Dragging = id;
+      }
+      function sim1DragEnd() {
+        sim1Dragging = null;
+      }
+      function sim1Over(e, i) {
+        e.preventDefault();
+        e.currentTarget.classList.add("dragover");
+      }
+      function sim1Leave(e) {
+        e.currentTarget.classList.remove("dragover");
+      }
+      function sim1Drop(e, i) {
+        e.preventDefault();
+        e.currentTarget.classList.remove("dragover");
+        if (!sim1Dragging) return;
+        if (sim1Slots[i]) return; // already filled
+        const item = sim1Data.find((d) => d.id === sim1Dragging);
+        sim1Slots[i] = item;
+        renderSim1();
+      }
+      function sim1Remove(i) {
+        sim1Slots[i] = null;
+        renderSim1();
+      }
+
+      function checkSim1() {
+        let correct = 0;
+        sim1Slots.forEach((item, i) => {
+          if (item && item.order === i + 1) correct++;
+        });
+        const fb = document.getElementById("sim1-feedback");
+        fb.classList.remove("hidden");
+        if (correct === 6) {
+          fb.className =
+            "mt-4 rounded-lg p-4 text-sm font-semibold bg-green-500/10 border border-green-500/30 text-green-400";
+          fb.textContent = "🎉 Sempurna! Semua urutan benar! +50 poin";
+          if (!state.simDone.has("sim1")) {
+            state.simDone.add("sim1");
+            addScore(50);
+          }
+          showToast(
+            "Simulasi 1 Selesai!",
+            "Urutan transaksi 100% benar! +50 poin 🔥",
+            "success",
+          );
+        } else {
+          fb.className =
+            "mt-4 rounded-lg p-4 text-sm font-semibold bg-red-500/10 border border-red-500/30 text-red-400";
+          fb.textContent = `${correct}/6 urutan benar. Coba lagi! Ingat alur: Kebutuhan → Cari Penjual → Pilih Produk → Negosiasi → Bayar → Terima Barang`;
+        }
+      }
+
+      function resetSim1() {
+        sim1Slots = Array(6).fill(null);
+        document.getElementById("sim1-feedback").classList.add("hidden");
+        renderSim1();
+      }
+
+      function showSim(n) {
+        document.getElementById("sim1-container").classList.add("hidden");
+        document.getElementById("sim2-container").classList.add("hidden");
+        if (n === 1) {
+          document.getElementById("sim1-container").classList.remove("hidden");
+          resetSim1();
+        } else {
+          document.getElementById("sim2-container").classList.remove("hidden");
+          resetSim2();
+        }
+      }
+
+      // ============================
+      // SIMULASI 2: Klasifikasi
+      // ============================
+      const sim2Items = [
+        { id: "p1", text: "🏪 Pedagang Pasar", cat: "penjual" },
+        { id: "p2", text: "🛒 Konsumen Akhir", cat: "pembeli" },
+        { id: "p3", text: "🧾 Kwitansi", cat: "dokumen" },
+        { id: "p4", text: "🏢 Distributor", cat: "penjual" },
+        { id: "p5", text: "👨 Pembeli Grosir", cat: "pembeli" },
+        { id: "p6", text: "📋 Invoice / Faktur", cat: "dokumen" },
+        { id: "p7", text: "🏬 Retail Store", cat: "penjual" },
+        { id: "p8", text: "📄 Surat Pesanan (PO)", cat: "dokumen" },
+        { id: "p9", text: "👩 Pembeli Eceran", cat: "pembeli" },
+      ];
+      let sim2Placed = {};
+
+      function renderSim2() {
+        const itemsEl = document.getElementById("sim2-items");
+        const placed = Object.keys(sim2Placed);
+        const remaining = sim2Items.filter((d) => !placed.includes(d.id));
+        itemsEl.innerHTML = remaining
+          .map(
+            (item) => `
+    <div class="drag-item" draggable="true" id="si-${item.id}"
+      ondragstart="sim2DragStart('${item.id}')"
+    >${item.text}</div>
+  `,
+          )
+          .join("");
+      }
+
+      let sim2Dragging = null;
+      function sim2DragStart(id) {
+        sim2Dragging = id;
+      }
+      function dzOver(e) {
+        e.preventDefault();
+        e.currentTarget.classList.add("dragover");
+      }
+      function dzLeave(e) {
+        e.currentTarget.classList.remove("dragover");
+      }
+      function dzDrop(e, cat) {
+        e.preventDefault();
+        e.currentTarget.classList.remove("dragover");
+        if (!sim2Dragging) return;
+        const item = sim2Items.find((d) => d.id === sim2Dragging);
+        sim2Placed[item.id] = cat;
+        const dz = document.getElementById("dz-" + cat);
+        const span = dz.querySelector("span");
+        if (span) span.remove();
+        const el = document.createElement("div");
+        el.className = "placed-item cursor-pointer";
+        el.textContent = item.text + " ✕";
+        el.onclick = () => {
+          delete sim2Placed[item.id];
+          dz.removeChild(el);
+          renderSim2();
+        };
+        dz.appendChild(el);
+        sim2Dragging = null;
+        renderSim2();
+      }
+
+      function checkSim2() {
+        let correct = 0;
+        const total = Object.keys(sim2Placed).length;
+        Object.entries(sim2Placed).forEach(([id, cat]) => {
+          const item = sim2Items.find((d) => d.id === id);
+          if (item && item.cat === cat) correct++;
+        });
+        const fb = document.getElementById("sim2-feedback");
+        fb.classList.remove("hidden");
+        if (correct === 9 && total === 9) {
+          fb.className =
+            "mt-4 rounded-lg p-4 text-sm font-semibold bg-green-500/10 border border-green-500/30 text-green-400";
+          fb.textContent = `🎉 Luar biasa! Semua ${correct}/9 klasifikasi benar! +60 poin`;
+          if (!state.simDone.has("sim2")) {
+            state.simDone.add("sim2");
+            addScore(60);
+          }
+          showToast(
+            "Simulasi 2 Selesai!",
+            "Semua item diklasifikasi dengan benar! +60 poin 🎯",
+            "success",
+          );
+        } else {
+          fb.className =
+            "mt-4 rounded-lg p-4 text-sm font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-400";
+          fb.textContent = `${correct}/${total} benar. ${total < 9 ? "Drag semua item dulu!" : "Ada yang salah kategori, cek lagi!"}`;
+        }
+      }
+
+      function resetSim2() {
+        sim2Placed = {};
+        ["penjual", "pembeli", "dokumen"].forEach((cat) => {
+          const dz = document.getElementById("dz-" + cat);
+          if (dz)
+            dz.innerHTML =
+              '<span class="text-stone-600 text-xs self-center w-full text-center">Drop di sini</span>';
+        });
+        document.getElementById("sim2-feedback").classList.add("hidden");
+        renderSim2();
+      }
+
+      // ============================
+      // QUIZ / EVALUASI
+      // ============================
+      const quizData = [
+        {
+          q: "Apa yang dimaksud dengan jual beli dalam konteks hukum perdata?",
+          options: [
+            "Kegiatan tukar menukar barang tanpa uang",
+            "Perjanjian konsensual untuk memindahkan kepemilikan barang/jasa dengan imbalan uang",
+            "Aktivitas produksi barang untuk dijual",
+            "Proses distribusi barang dari pabrik ke konsumen",
+          ],
+          ans: 1,
+        },
+        {
+          q: "Tahap pertama dalam alur proses jual beli adalah...",
+          options: [
+            "Negosiasi harga",
+            "Pembayaran",
+            "Identifikasi kebutuhan",
+            "Serah terima barang",
+          ],
+          ans: 2,
+        },
+        {
+          q: "Dokumen yang merupakan permintaan resmi dari pembeli kepada penjual untuk membeli barang disebut...",
+          options: ["Kwitansi", "Surat Jalan", "Purchase Order (PO)", "BAST"],
+          ans: 2,
+        },
+        {
+          q: "BATNA dalam konteks negosiasi singkatan dari...",
+          options: [
+            "Best Alternative To Negotiated Agreement",
+            "Business And Trading Negotiation Act",
+            "Buyer And Transaction Negotiation Agreement",
+            "Basic Analysis To Negotiate Accurately",
+          ],
+          ans: 0,
+        },
+        {
+          q: "Pasar yang hanya memiliki satu penjual yang menguasai seluruh penawaran disebut...",
+          options: [
+            "Oligopoli",
+            "Monopolistik",
+            "Monopoli",
+            "Persaingan sempurna",
+          ],
+          ans: 2,
+        },
+        {
+          q: "Metode pembayaran COD (Cash on Delivery) artinya...",
+          options: [
+            "Bayar di muka sebelum barang dikirim",
+            "Bayar menggunakan kartu kredit",
+            "Bayar saat barang sudah diterima",
+            "Bayar dengan cicilan bulanan",
+          ],
+          ans: 2,
+        },
+        {
+          q: "BAST dalam transaksi jual beli merupakan singkatan dari...",
+          options: [
+            "Bukti Atas Selesai Transaksi",
+            "Berita Acara Serah Terima",
+            "Buku Administrasi Stok Toko",
+            "Blanko Akuntansi Sistem Terpadu",
+          ],
+          ans: 1,
+        },
+        {
+          q: "Fungsi utama layanan purna jual (after sales service) dalam pemasaran adalah...",
+          options: [
+            "Meningkatkan harga jual produk",
+            "Mengurangi biaya produksi",
+            "Mempertahankan dan membangun loyalitas pelanggan",
+            "Mempercepat proses distribusi",
+          ],
+          ans: 2,
+        },
+        {
+          q: "Perbedaan utama pasar konkret dan pasar abstrak adalah...",
+          options: [
+            "Pasar konkret hanya untuk produk mahal, abstrak untuk murah",
+            "Pasar konkret memerlukan pertemuan fisik, abstrak tidak",
+            "Pasar konkret online, abstrak offline",
+            "Tidak ada perbedaan",
+          ],
+          ans: 1,
+        },
+        {
+          q: "Dokumen yang menyertai pengiriman fisik barang sebagai bukti bahwa barang telah dikirim disebut...",
+          options: ["Nota Retur", "Invoice", "Surat Jalan", "Kwitansi"],
+          ans: 2,
+        },
+      ];
+
+      let quizState = { current: 0, score: 0, correct: 0, answered: false };
+
+      function startQuiz() {
+        quizState = { current: 0, score: 0, correct: 0, answered: false };
+        document.getElementById("quiz-start").classList.add("hidden");
+        document.getElementById("quiz-result").classList.add("hidden");
+        document.getElementById("quiz-container").classList.remove("hidden");
+        renderQuestion();
+      }
+
+      function renderQuestion() {
+        const q = quizData[quizState.current];
+        document.getElementById("q-num").textContent = quizState.current + 1;
+        document.getElementById("q-score").textContent = quizState.score;
+        document.getElementById("q-progress").style.width =
+          (quizState.current / 10) * 100 + "%";
+        document.getElementById("q-text").textContent = q.q;
+        document.getElementById("q-options").innerHTML = q.options
+          .map(
+            (opt, i) => `
+    <div class="quiz-option" onclick="selectAnswer(${i})">${String.fromCharCode(65 + i)}. ${opt}</div>
+  `,
+          )
+          .join("");
+        document.getElementById("q-feedback").classList.add("hidden");
+        document.getElementById("q-next").classList.add("hidden");
+        quizState.answered = false;
+      }
+
+      function selectAnswer(i) {
+        if (quizState.answered) return;
+        quizState.answered = true;
+        const q = quizData[quizState.current];
+        const opts = document.querySelectorAll(".quiz-option");
+        opts.forEach((opt, idx) => {
+          if (idx === q.ans) opt.classList.add("correct");
+          else if (idx === i && i !== q.ans) opt.classList.add("wrong");
+        });
+        const fb = document.getElementById("q-feedback");
+        fb.classList.remove("hidden");
+        if (i === q.ans) {
+          quizState.correct++;
+          quizState.score += 10;
+          addScore(10);
+          fb.className =
+            "card-market p-4 mb-4 text-sm bg-green-500/10 border border-green-500/30 text-green-400";
+          fb.textContent = "✓ Benar! +10 poin";
+        } else {
+          fb.className =
+            "card-market p-4 mb-4 text-sm bg-red-500/10 border border-red-500/30 text-red-400";
+          fb.textContent = `✗ Kurang tepat. Jawaban yang benar: ${String.fromCharCode(65 + q.ans)}. ${q.options[q.ans]}`;
+        }
+        document.getElementById("q-score").textContent = quizState.score;
+        const nextBtn = document.getElementById("q-next");
+        nextBtn.classList.remove("hidden");
+        nextBtn.textContent =
+          quizState.current < 9 ? "Soal Berikutnya →" : "Lihat Hasil";
+      }
+
+      function nextQuestion() {
+        if (quizState.current >= 9) {
+          showResult();
+        } else {
+          quizState.current++;
+          renderQuestion();
+        }
+      }
+
+      function showResult() {
+        document.getElementById("quiz-container").classList.add("hidden");
+        document.getElementById("quiz-result").classList.remove("hidden");
+        const pct = quizState.correct * 10;
+        document.getElementById("result-score").textContent = quizState.score;
+        document.getElementById("result-correct").textContent =
+          `${quizState.correct}/10`;
+        document.getElementById("result-pct").textContent = pct + "%";
+        if (pct >= 90) {
+          document.getElementById("result-emoji").textContent = "🏆";
+          document.getElementById("result-title").textContent = "Luar Biasa!";
+          document.getElementById("result-desc").textContent =
+            "Penguasaan materimu sangat baik. Siap jadi pemasar profesional!";
+        } else if (pct >= 70) {
+          document.getElementById("result-emoji").textContent = "🎉";
+          document.getElementById("result-title").textContent = "Bagus!";
+          document.getElementById("result-desc").textContent =
+            "Kamu sudah memahami materi dengan baik. Terus tingkatkan!";
+        } else {
+          document.getElementById("result-emoji").textContent = "📚";
+          document.getElementById("result-title").textContent =
+            "Terus Belajar!";
+          document.getElementById("result-desc").textContent =
+            "Nilai kamu belum mencapai KKM 70. Pelajari ulang materinya ya!";
+        }
+        showToast(
+          "Evaluasi Selesai!",
+          `Nilai kamu: ${pct}% (${quizState.correct}/10 benar)`,
+          pct >= 70 ? "success" : "error",
+        );
+      }
+
+      function restartQuiz() {
+        document.getElementById("quiz-result").classList.add("hidden");
+        startQuiz();
+      }
+
+      // ============================
+      // TOAST
+      // ============================
+      function showToast(title, msg, type = "info") {
+        const c = document.getElementById("toast-container");
+        const t = document.createElement("div");
+        t.className = `toast ${type}`;
+        t.innerHTML = `<div class="font-bold text-xs mb-0.5" style="color:${type === "success" ? "#4ade80" : type === "error" ? "#f87171" : "#fbbf24"}">${title}</div><div class="text-stone-300">${msg}</div>`;
+        c.appendChild(t);
+        setTimeout(() => t.remove(), 4000);
+      }
+
+      // ============================
+      // INIT
+      // ============================
+      window.onload = function () {
+        initTicker();
+      };
+    </script>
+  </body>
+</html>
