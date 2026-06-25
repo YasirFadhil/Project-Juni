@@ -1198,8 +1198,8 @@
     }
 
     function aksiMasuk() {
-      // Save state to localStorage to persist dashboard view
-      localStorage.setItem('activeView', 'dashboard');
+      // Save state to sessionStorage to persist dashboard view across reloads but not new sessions
+      sessionStorage.setItem('activeView', 'dashboard');
       
       const intro = document.getElementById('section-intro');
       const dash = document.getElementById('page-dashboard');
@@ -1291,7 +1291,7 @@ function backDashboard() {
 }
 
 function buildBackBtn() {
-  return `<button class="btn-back-dashboard" onclick="backDashboard()">← Kembali ke Dashboard</button>`;
+  return `<button class="btn-back-dashboard" onclick="event.stopPropagation(); backDashboard()">← Kembali ke Dashboard</button>`;
 }
 
 /* =========================================================
@@ -1890,7 +1890,7 @@ function buildProfilPembuat() {
 
     <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
       <a class="profil-porto-btn" href="#" onclick="return false;">🌐 Lihat Portofolio</a>
-      <button class="btn-back-dashboard" onclick="backDashboard()" style="margin:0;">← Kembali ke Dashboard</button>
+      <button class="btn-back-dashboard" onclick="event.stopPropagation(); backDashboard()" style="margin:0;">← Kembali ke Dashboard</button>
     </div>
   </div>`;
 }
@@ -1901,8 +1901,8 @@ function buildProfilPembuat() {
 window.addEventListener('DOMContentLoaded', () => {
   // All modules clickable from the start for demo purposes
   
-  // Restore dashboard session if activeView is set in localStorage
-  if (localStorage.getItem('activeView') === 'dashboard') {
+  // Restore dashboard session if activeView is set in sessionStorage
+  if (sessionStorage.getItem('activeView') === 'dashboard') {
     document.getElementById('section-thumbnail').style.display = 'none';
     document.getElementById('section-intro').style.display = 'none';
     document.getElementById('page-dashboard').style.display = 'block';
